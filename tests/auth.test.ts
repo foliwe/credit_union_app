@@ -34,6 +34,7 @@ import {
   buildPasswordSignInPayload,
   isOfflineLoginAllowed,
   loginCodeToEmail,
+  mobileSignInPreflightCheck,
   persistSessionSnapshot,
   readSessionSnapshot,
   signInWithCredentials,
@@ -245,5 +246,22 @@ describe('mobile auth', () => {
       password: 'good-secret',
     })
     expect(result.error).toBeNull()
+  })
+
+  it('blocks admin sign-in attempts on the mobile app', () => {
+    const error = mobileSignInPreflightCheck({ role: 'admin', email: 'admin@example.com', password: 'pass' })
+    expect(error).toBeInstanceOf(Error)
+    expect(error?.message).toMatch(/admin app/i)
+  })
+
+  it('blocks manager sign-in attempts on the mobile app', () => {
+    const error = mobileSignInPreflightCheck({ role: 'manager', email: 'mgr@example.com', password: 'pass' })
+    expect(error).toBeInstanceOf(Error)
+    expect(error?.message).toMatch(/admin app/i)
+  })
+
+  it('allows agent and member sign-in on the mobile app', () => {
+    expect(mobileSignInPreflightCheck({ role: 'agent', code: 'AGENT01', password: 'pass' })).toBeNull()
+    expect(mobileSignInPreflightCheck({ role: 'member', code: 'MEMBER01', password: 'pass' })).toBeNull()
   })
 })

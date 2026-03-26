@@ -7,20 +7,20 @@ import { ThemedView } from '@/components/themed-view'
 import { useSession } from '@/components/auth/session-provider'
 import type { AppRole } from '@/lib/auth/types'
 
-type MobileLoginRole = Extract<AppRole, 'admin' | 'manager' | 'agent' | 'member'>
+// Managers and admins use the admin app exclusively and cannot sign in here.
 
-const LOGIN_ROLES: MobileLoginRole[] = ['agent', 'member', 'manager', 'admin']
+type MobileLoginRole = Extract<AppRole, 'agent' | 'member'>
+
+const LOGIN_ROLES: MobileLoginRole[] = ['agent', 'member']
 
 export default function LoginScreen() {
   const { isReady, role, signIn, isRemoteAuthConfigured, authConfigMessage } = useSession()
   const [selectedRole, setSelectedRole] = useState<MobileLoginRole>('agent')
-  const [email, setEmail] = useState('')
   const [code, setCode] = useState('')
   const [password, setPassword] = useState('')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
-  const usesCode = selectedRole === 'agent' || selectedRole === 'member'
   const isSignInDisabled = isPending || !isRemoteAuthConfigured
 
   const redirectHref = useMemo(() => {
@@ -48,7 +48,7 @@ export default function LoginScreen() {
       <View style={styles.card}>
         <ThemedText type="title">Secure Access</ThemedText>
         <ThemedText style={styles.supportingText}>
-          Agents and members sign in with code plus password. Managers and admins use email.
+          Agents and members sign in with their code and password.
         </ThemedText>
 
         {!isRemoteAuthConfigured ? (
@@ -70,24 +70,13 @@ export default function LoginScreen() {
           ))}
         </View>
 
-        {usesCode ? (
-          <TextInput
-            autoCapitalize="characters"
-            onChangeText={setCode}
-            placeholder="Agent or member code"
-            style={styles.input}
-            value={code}
-          />
-        ) : (
-          <TextInput
-            autoCapitalize="none"
-            keyboardType="email-address"
-            onChangeText={setEmail}
-            placeholder="Email address"
-            style={styles.input}
-            value={email}
-          />
-        )}
+        <TextInput
+          autoCapitalize="characters"
+          onChangeText={setCode}
+          placeholder="Agent or member code"
+          style={styles.input}
+          value={code}
+        />
 
         <TextInput
           onChangeText={setPassword}
@@ -110,11 +99,7 @@ export default function LoginScreen() {
           onPress={() => {
             setErrorMessage(null)
             startTransition(async () => {
-              const error = await signIn(
-                usesCode
-                  ? { role: selectedRole as 'agent' | 'member', code, password }
-                  : { role: selectedRole as 'admin' | 'manager', email, password }
-              )
+              const error = await signIn({ role: selectedRole, code, password })
 
               if (error) {
                 setErrorMessage(error.message)
