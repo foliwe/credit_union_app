@@ -1,50 +1,44 @@
-# Welcome to your Expo app 👋
+# Mobile App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+This Expo app supports field agents and members with offline-first local storage and a Supabase-backed auth flow.
 
-## Get started
+## Local setup
 
-1. Install dependencies
+1. Install dependencies.
 
    ```bash
    npm install
    ```
 
-2. Start the app
+2. Create a local env file from the tracked example.
+
+   ```bash
+   copy .env.example .env.local
+   ```
+
+3. Set the required Expo public variables in `.env.local`.
+
+   ```dotenv
+   EXPO_PUBLIC_SUPABASE_URL=https://your-project-ref.supabase.co
+   EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-publishable-key
+   ```
+
+4. Start Expo.
 
    ```bash
    npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+5. After changing `.env.local`, do a full Expo restart before testing again.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## Expo Go preview behavior
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+- If `EXPO_PUBLIC_SUPABASE_URL` or `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` is missing, the app now stays up and shows a configuration message on the login screen.
+- Cached offline access still works only when the device already has a valid stored session.
+- Live sign-in and other server-backed actions stay blocked until the public Supabase env is configured again.
 
-## Get a fresh project
+## Notes
 
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- Keep real local values in `.env.local` only. The repo tracks `.env.example` as the template.
+- `EXPO_PUBLIC_*` values are bundled into the app, so do not treat them as secrets.
+- `.env.local` remains ignored by Git through the existing `.env*.local` rule.

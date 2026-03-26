@@ -1,0 +1,17 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Start mobile Expo preview",
+			"type": "shell",
+			"command": "npx",
+			"args": [
+				"expo",
+				"start",
+				"-c"
+			],
+			"isBackground": true,
+			"group": "build"
+		}
+	]
+}
