@@ -6,6 +6,7 @@ import type { Session, User } from '@supabase/supabase-js'
 import {
   SESSION_STORAGE_KEY,
   isOfflineLoginAllowed,
+  mobileSignInPreflightCheck,
   persistSessionSnapshot,
   readSessionSnapshot,
   signInWithCredentials,
@@ -148,6 +149,11 @@ export function SessionProvider({ children }: PropsWithChildren) {
       snapshot,
       role,
       async signIn(input) {
+        const preflightError = mobileSignInPreflightCheck(input)
+        if (preflightError) {
+          return preflightError
+        }
+
         if (authConfigState.status !== 'configured') {
           return new Error(authConfigState.message)
         }

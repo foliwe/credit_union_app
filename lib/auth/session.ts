@@ -83,3 +83,14 @@ export function isOfflineLoginAllowed(snapshot: SessionSnapshot | null, now: Dat
 
   return new Date(snapshot.expiresAt).getTime() > now.getTime()
 }
+
+/**
+ * Returns an error if the given login input is for a role that is not permitted
+ * on the mobile app. Managers and admins use the admin app exclusively.
+ */
+export function mobileSignInPreflightCheck(input: LoginInput): Error | null {
+  if (input.role === 'admin' || input.role === 'manager') {
+    return new Error('Managers and admins must use the admin app to sign in.')
+  }
+  return null
+}
